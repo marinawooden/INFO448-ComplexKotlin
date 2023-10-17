@@ -3,13 +3,37 @@
  */
 package edu.uw.complexkotlin
 
+
+// EXTRA CREDIT: Who the heck was Seneca the Younger?
+// Seneca the younger was a greek philosopher of the stoic
+// school of thoughts.  Stoicism taught that a well-lived
+// life is one where a person tries to be the best and most
+// virtuous version of themselves.
+
+
 // write a lambda using map and fold to solve "FIZZBUZZ" for the first fifteen numbers (0..15).
 // use map() to return a list with "", "FIZZ" (for 3s) or "BUZZ" (for 5s).
 // use fold() to compress the array of strings down into a single string.
 // the final string should look like FIZZBUZZFIZZFIZZBUZZFIZZFIZZBUZZ for 0..15.
 // store this lambda into 'fizzbuzz' so that the tests can call it
 //
-val fizzbuzz : (IntRange) -> String = { _ -> "" }
+val fizzbuzz : (IntRange) -> String = { range -> range.map {
+    num ->
+        if (num > 0) {
+            if (num % 3 == 0 && num % 5 == 0) {
+                "FIZZBUZZ"
+            } else if (num % 3 == 0) {
+                "FIZZ"
+            } else if (num % 5 == 0) {
+                "BUZZ"
+            } else {
+                ""
+            }
+        } else {
+            ""
+        }
+    }.fold("") {old, new -> old + new}
+}
 
 // Example usage
 /*
@@ -35,17 +59,29 @@ fun process(message: String, block: (String) -> String): String {
 }
 // Create r1 as a lambda that calls process() with message "FOO" 
 // and a block that returns "BAR"
-val r1 = { "" }
+val r1 = { process("FOO") { "BAR"} }
 
 // Create r2 as a lambda that calls process() with message "FOO" 
 // and a block that upper-cases r2_message, and repeats it three 
 // times with no spaces: "WOOGAWOOGAWOOGA"
 val r2_message = "wooga"
-val r2 = { "" }
+val r2 = { process("FOO") { r2_message.toUpperCase().repeat(3) }}
 
 
 // write an enum-based state machine between talking and thinking
-enum class Philosopher { }
+// write an enum-based state machine between talking and thinking
+enum class Philosopher {
+    TALKING {
+        override fun signal() = THINKING
+        override fun toString() = "Allow me to suggest an idea..."
+    },
+    THINKING {
+        override fun signal() = TALKING
+        override fun toString() = "Deep thoughts...."
+    };
+
+    abstract fun signal(): Philosopher
+}
 
 // create an class "Command" that can be used as a function 
 // (provide an "invoke()" function)
@@ -54,4 +90,8 @@ enum class Philosopher { }
 // when invoked, the Command object should return a String c
 // ontaining the prompt and then the message.
 // Example: Command(": ")("Hello!") should print ": Hello!"
-class Command(val prompt: String) { }
+class Command(val prompt: String) {
+    operator fun invoke(message: String): String {
+        return "$prompt$message"
+    }
+}
